@@ -328,6 +328,10 @@ ensure_python_runtime() {
   if ! command -v python3 >/dev/null 2>&1; then
     apt_install python3
   fi
+
+  if ! python3 -c "import scapy.all" >/dev/null 2>&1; then
+    apt_install python3-scapy
+  fi
 }
 
 run_bridge_now() {
