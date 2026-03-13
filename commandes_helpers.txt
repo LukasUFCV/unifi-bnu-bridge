@@ -1,0 +1,58 @@
+# 1) Stopper le bridge BNU en cours
+if [ -f /run/bnu-reply-relay.pid ]; then
+  kill "$(cat /run/bnu-reply-relay.pid)" 2>/dev/null || true
+fi
+pkill -f '/data/bnu-proxy/bnu_bridge.py' 2>/dev/null || true
+pkill -f 'bnu_bridge.py' 2>/dev/null || true
+rm -f /run/bnu-reply-relay.pid
+
+# 2) Enlever le script on-boot BNU
+rm -f /data/on_boot.d/22-bnu-bridge.sh
+
+# 3) Enlever les fichiers BNU générés
+rm -rf /data/bnu-proxy
+
+# 4) Enlever la route host /32 ajoutée par le script
+ip route del 10.11.12.174/32 dev tun1 2>/dev/null || true
+
+# 5) Stopper et retirer udm-boot installé par l’installateur
+systemctl stop udm-boot 2>/dev/null || true
+systemctl disable udm-boot 2>/dev/null || true
+rm -f /etc/systemd/system/multi-user.target.wants/udm-boot.service
+rm -f /etc/systemd/system/udm-boot.service
+systemctl daemon-reload
+systemctl reset-failed udm-boot 2>/dev/null || true
+
+# 6) Enlever les scripts on-boot ajoutés par l’installateur on-boot-script-2.x
+rm -f /data/on_boot.d/05-install-cni-plugins.sh
+rm -f /data/on_boot.d/06-cni-bridge.sh
+
+# 7) Enlever le cache CNI téléchargé par l’installateur
+rm -rf /data/.cache/cni-plugins
+
+# 8) Vérifications
+echo '===== PROCESS ====='
+pgrep -af 'bnu_bridge.py|udm-boot' || true
+
+echo '===== ON_BOOT ====='
+ls -l /data/on_boot.d 2>/dev/null || true
+
+echo '===== SERVICE ====='
+systemctl status udm-boot --no-pager 2>/dev/null || true
+
+echo '===== ROUTE /32 ====='
+ip route show | grep '^10\.11\.12\.174/32 ' || true
+
+
+
+
+tail -f /data/bnu-proxy/bnu-bridge.log
+
+tcpdump -ni br20 -vvv -e -s0 \
+'((udp port 67 or udp port 68 or udp port 4011) and (ether host e8:80:88:d0:e3:97 or ether broadcast))'
+
+tcpdump -ni tun1 -vvv -e -s0 \
+'(udp port 67 or udp port 68 or udp port 4011)'
+
+
+tcpdump -ni br0 -vvv -e -s0 '((udp port 67 or udp port 68 or udp port 4011) and (ether host e8:80:88:d0:e3:97 or ether broadcast))'
