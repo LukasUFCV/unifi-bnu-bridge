@@ -190,8 +190,10 @@ def forward_bitlocker_request(pkt):
 
         # BOOTP fixed header
         # byte 3 = hops
+        # bytes 20:24 = siaddr
         # bytes 24:28 = giaddr
         payload[3] = min(payload[3] + 1, 255)
+        payload[20:24] = socket.inet_aton(WDS_IP)
         payload[24:28] = socket.inet_aton(RELAY_IP)
 
         out = IP(src=RELAY_IP, dst=WDS_IP, tos=0xc0) / UDP(sport=67, dport=67) / bytes(payload)
