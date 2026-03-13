@@ -83,9 +83,9 @@ import sys
 import os
 
 TUN_IFACE = "tun1"
-LAN_IFACE = "br20"
+LAN_IFACE = "br0"
 WDS_IP = "10.11.12.174"
-RELAY_IP = "10.11.20.1"
+RELAY_IP = None
 LOGFILE = "/data/bnu-proxy/bnu-bridge.log"
 
 def ensure_scapy():
@@ -108,6 +108,22 @@ def ensure_scapy():
 
     importlib.invalidate_caches()
     from scapy.all import sniff, send, sendp, Ether, IP, UDP, BOOTP, raw, get_if_hwaddr
+
+def get_iface_ipv4(iface):
+    result = subprocess.run(
+        ["ip", "-4", "-o", "addr", "show", "dev", iface],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+
+    for line in result.stdout.splitlines():
+        parts = line.split()
+        if "inet" in parts:
+            ip_cidr = parts[parts.index("inet") + 1]
+            return ip_cidr.split("/")[0]
+
+    raise RuntimeError(f"Aucune IPv4 trouvée sur l'interface {iface}")
 
 pending = {}
 lock = threading.Lock()
@@ -259,7 +275,10 @@ def sniff_tun():
     )
 
 def main():
+    global RELAY_IP
+
     ensure_scapy()
+    RELAY_IP = get_iface_ipv4(LAN_IFACE)
     log(f"Starting BNU bridge LAN={LAN_IFACE} TUN={TUN_IFACE} WDS={WDS_IP} RELAY_IP={RELAY_IP}")
 
     t1 = threading.Thread(target=sniff_lan, daemon=True)
@@ -309,7 +328,7 @@ rm -f "$PIDFILE"
 
 # Attente interfaces/routage
 for i in $(seq 1 30); do
-  ip link show br20 >/dev/null 2>&1 && ip link show tun1 >/dev/null 2>&1 && break
+  ip link show br0 >/dev/null 2>&1 && ip link show tun1 >/dev/null 2>&1 && break
   sleep 2
 done
 
