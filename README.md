@@ -233,18 +233,19 @@ This will:
 
 ---
 
+## 👨‍💻 Author
+
+Developed by Lukas MAUFFRÉ  
+🚀 Cybersecurity & Infrastructure Engineering  
+Information Systems Department (UFCV)
+
+---
+
 ## 📜 License
 
 **UFCV DSI – Infrastructure & Systems**
 
 This repository is intended for internal professional use within an organizational context.
 
-All rights reserved.
+All rights reserved.  
 Unauthorized use, reproduction, modification, or distribution outside the company or authorized scope is prohibited without prior permission.
-
----
-
-## 👨‍💻 Author
-
-Developed by Lukas MAUFFRÉ
-🚀 Cybersecurity & Infrastructure Engineering
