@@ -84,7 +84,7 @@ import os
 
 TUN_IFACE = "tun1"
 LAN_IFACE = "br0"
-WDS_IP = "10.11.12.174"
+WDS_IP = "192.168.5.222"
 RELAY_IP = None
 LOGFILE = "/data/bnu-proxy/bnu-bridge.log"
 
@@ -334,7 +334,7 @@ for i in $(seq 1 30); do
   sleep 2
 done
 
-ip route replace 10.11.12.174/32 dev tun1
+ip route replace 192.168.5.222/32 dev tun1
 
 # Redémarrage propre
 nohup python3 "$SCRIPT" >"$STDOUT_LOG" 2>&1 &
@@ -381,7 +381,7 @@ show_status() {
   echo "----- STDOUT -----"
   tail -n 20 "$BNU_DIR/bnu-bridge.stdout" 2>/dev/null || true
   echo "----- ROUTE WDS -----"
-  ip route get 10.11.12.174 || true
+  ip route get 192.168.5.222 || true
   echo "----- HASH -----"
   if [ -f "$PY_HASH_FILE" ]; then
     cat "$PY_HASH_FILE"

@@ -56,7 +56,7 @@ This enables BitLocker Network Unlock across routed or tunneled environments whe
 - Network setup including:
   - LAN interface (`br0`)
   - Tunnel interface (`tun1`)
-- Accessible WDS server (default: `10.11.12.174`)
+- Accessible WDS server (default: `192.168.5.222`)
 - Internet access (for package installation)
 
 ---

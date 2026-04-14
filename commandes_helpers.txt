@@ -13,7 +13,7 @@ rm -f /data/on_boot.d/22-bnu-bridge.sh
 rm -rf /data/bnu-proxy
 
 # 4) Enlever la route host /32 ajoutée par le script
-ip route del 10.11.12.174/32 dev tun1 2>/dev/null || true
+ip route del 192.168.5.222/32 dev tun1 2>/dev/null || true
 
 # 5) Stopper et retirer udm-boot installé par l’installateur
 systemctl stop udm-boot 2>/dev/null || true
